@@ -65,9 +65,7 @@
 log() {
     # Make sure it returns 0 code even when verose mode is off (test 1)
     # To use like [[ condition ]] && log "x" && something
-    #echo -e "$@" >&2
-    echo "$@" >>/dev/stderr
-    echo test >>/dev/stderr
+    echo -e "$@"
     #[[ -n "$VERBOSE" ]] && echo -e "$@" || test 1
 }
 
@@ -559,14 +557,18 @@ function resign {
     # Check for and update bundle identifiers for extensions and associated nested apps
     log "Fixing nested app and extension references"
     for key in ${NESTED_APP_REFERENCE_KEYS[@]}; do
+        log "key = ${key}"
         # Check if Info.plist has a reference to another app or extension
         REF_BUNDLE_ID=`PlistBuddy -c "Print ${key}" "$APP_PATH/Info.plist" 2>/dev/null`
+        log "bundle id = ${REF_BUNDLE_ID}"
         if [ -n "$REF_BUNDLE_ID" ];
         then
             # Found a reference bundle id, now get the corresponding provisioning profile for this bundle id
             REF_PROVISION=`provision_for_bundle_id $REF_BUNDLE_ID`
+            log "provision id = ${REF_PROVISION}"
             # Map to the new bundle id
             NEW_REF_BUNDLE_ID=`bundle_id_for_provison "$REF_PROVISION"`
+            log "new ref bundle id = ${NEW_REF_BUNDLE_ID}"
             # Change if not the same
             if [ "$REF_BUNDLE_ID" != "$NEW_REF_BUNDLE_ID" ];
             then
