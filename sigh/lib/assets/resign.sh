@@ -573,7 +573,7 @@ function resign {
             if [ "$REF_BUNDLE_ID" != "$NEW_REF_BUNDLE_ID" ];
             then
                 log "Updating nested app or extension reference for ${key} key from ${REF_BUNDLE_ID} to ${NEW_REF_BUNDLE_ID}"
-                `PlistBuddy -c "Set ${key} $NEW_REF_BUNDLE_ID" "$APP_PATH/Info.plist"`
+                #`PlistBuddy -c "Set ${key} $NEW_REF_BUNDLE_ID" "$APP_PATH/Info.plist"`
             fi
         fi
     done
