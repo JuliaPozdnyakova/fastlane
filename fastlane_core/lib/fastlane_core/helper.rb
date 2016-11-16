@@ -2,6 +2,7 @@ require 'logger'
 require 'colored'
 
 module FastlaneCore
+  # rubocop:disable Metrics/ModuleLength
   module Helper
     # This method is deprecated, use the `UI` class
     # https://github.com/fastlane/fastlane/blob/master/fastlane/docs/UI.md
@@ -24,6 +25,27 @@ module FastlaneCore
       defined? SpecHelper
     end
 
+    # removes ANSI colors from string
+    def self.strip_ansi_colors(str)
+      str.gsub(/\e\[([;\d]+)?m/, '')
+    end
+
+    # @return [boolean] true if executing with bundler (like 'bundle exec fastlane [action]')
+    def self.bundler?
+      # Bundler environment variable
+      ['BUNDLE_BIN_PATH', 'BUNDLE_GEMFILE'].each do |current|
+        return true if ENV.key?(current)
+      end
+      return false
+    end
+
+    # Do we run from a bundled fastlane, which contains Ruby and OpenSSL?
+    # Usually this means the fastlane directory is ~/.fastlane/bin/
+    # We set this value via the environment variable `SELF_CONTAINED`
+    def self.contained_fastlane?
+      ENV["SELF_CONTAINED"].to_s == "true"
+    end
+
     # @return [boolean] true if building in a known CI environment
     def self.ci?
       # Check for Jenkins, Travis CI, ... environment variables
@@ -31,6 +53,15 @@ module FastlaneCore
         return true if ENV.key?(current)
       end
       return false
+    end
+
+    def self.windows?
+      # taken from: http://stackoverflow.com/a/171011/1945875
+      (/cygwin|mswin|mingw|bccwin|wince|emx/ =~ RUBY_PLATFORM) != nil
+    end
+
+    def self.linux?
+      (/linux/ =~ RUBY_PLATFORM) != nil
     end
 
     # Is the currently running computer a Mac?
@@ -154,4 +185,5 @@ module FastlaneCore
       end
     end
   end
+  # rubocop:enable Metrics/ModuleLength
 end
